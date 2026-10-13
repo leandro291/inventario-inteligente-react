@@ -1,6 +1,6 @@
 # Pantallas del canvas — Shell + Productos
 
-Estado: aprobada
+Estado: implementada
 Fase: 01 de 4
 
 ## Objetivo
