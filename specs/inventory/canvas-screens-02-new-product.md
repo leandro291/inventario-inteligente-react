@@ -1,6 +1,6 @@
 # Pantallas del canvas — Nuevo producto
 
-Estado: aprobada
+Estado: implementada
 Fase: 02 de 5
 
 ## Objetivo
