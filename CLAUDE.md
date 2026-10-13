@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Antes de crear o modificar código, leer y cumplir [`docs/SETUP.md`](docs/SETUP.md)**: estructura por módulos de dominio, naming, reglas de TS estricto, SOLID/DRY/KISS/YAGNI, reutilizar antes de crear (repo → shadcn → libs instaladas), criterios SDD vs BUILD, tamaño de sesión, paralelismo por olas, unit testing y Definition of Done.
 
+**UI:** colores, tipografía, espaciado y componentes según [`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md). Los tokens viven en `src/index.css`; no usar colores hex sueltos.
+
 Trabajo con Spec Driven Development mediante los agentes de [`.claude/agents/`](.claude/agents/):
 
 | Agente                                           | Rol                                                                                                                                  |
