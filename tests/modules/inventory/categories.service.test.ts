@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
-import { getCategories } from '@/modules/inventory/services/categories.service'
+import {
+  createCategory,
+  getCategories,
+} from '@/modules/inventory/services/categories.service'
 
-vi.mock('@/lib/api', () => ({ api: { get: vi.fn() } }))
+vi.mock('@/lib/api', () => ({ api: { get: vi.fn(), post: vi.fn() } }))
 
 const get = vi.mocked(api.get)
+const post = vi.mocked(api.post)
 
 describe('getCategories', () => {
   beforeEach(() => get.mockReset())
@@ -21,5 +25,30 @@ describe('getCategories', () => {
     get.mockResolvedValue({ data: [{ id: 'uno', nombre: 'Bebidas' }] })
 
     await expect(getCategories()).rejects.toThrow()
+  })
+})
+
+describe('createCategory', () => {
+  beforeEach(() => post.mockReset())
+
+  it('hace POST /categories/ con el nombre recortado y devuelve la categoría parseada', async () => {
+    const category = { id: 3, nombre: 'Bebidas' }
+    post.mockResolvedValue({ data: category })
+
+    await expect(createCategory({ nombre: '  Bebidas  ' })).resolves.toEqual(
+      category,
+    )
+    expect(post).toHaveBeenCalledWith('/categories/', { nombre: 'Bebidas' })
+  })
+
+  it('rechaza sin llamar al back si el nombre es inválido', async () => {
+    await expect(createCategory({ nombre: 'ab' })).rejects.toThrow()
+    expect(post).not.toHaveBeenCalled()
+  })
+
+  it('rechaza si la respuesta no cumple categorySchema', async () => {
+    post.mockResolvedValue({ data: { id: 'x', nombre: 'Bebidas' } })
+
+    await expect(createCategory({ nombre: 'Bebidas' })).rejects.toThrow()
   })
 })
