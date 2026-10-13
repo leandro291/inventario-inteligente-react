@@ -15,7 +15,6 @@ import {
   type ChatMessage,
 } from '@/modules/assistant/components/chat-messages'
 import { useAsk } from '@/modules/assistant/hooks/use-ask'
-import { getAskErrorMessage } from '@/modules/assistant/services/assistant.service'
 
 const GREETING: ChatMessage = {
   id: 'greeting',
@@ -28,8 +27,7 @@ export function ChatSheet() {
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING])
   const [draft, setDraft] = useState('')
   const [threadId] = useState(() => crypto.randomUUID())
-  const [error, setError] = useState<string | null>(null)
-  const { mutate, isPending } = useAsk()
+  const { mutate, isPending, errorMessage } = useAsk()
 
   function addMessage(author: ChatMessage['author'], text: string) {
     setMessages((prev) => [...prev, { id: crypto.randomUUID(), author, text }])
@@ -39,15 +37,11 @@ export function ChatSheet() {
     const pregunta = text.trim()
     addMessage('user', pregunta)
     setDraft('')
-    setError(null)
     mutate(
       { pregunta, thread_id: threadId },
       {
         onSuccess: ({ respuesta }) => addMessage('assistant', respuesta),
-        onError: (err) => {
-          setError(getAskErrorMessage(err))
-          setDraft(pregunta)
-        },
+        onError: () => setDraft(pregunta),
       },
     )
   }
@@ -84,12 +78,12 @@ export function ChatSheet() {
           </SheetClose>
         </div>
         <ChatMessages messages={messages} isPending={isPending} />
-        {error && (
+        {errorMessage && (
           <p
             role="alert"
             className="mx-5 mb-1 rounded-lg bg-destructive/10 px-3.5 py-2.5 text-sm text-destructive"
           >
-            {error}
+            {errorMessage}
           </p>
         )}
         <ChatComposer

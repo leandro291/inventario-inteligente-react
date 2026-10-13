@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { AxiosError, type AxiosResponse } from 'axios'
+import { AxiosError } from 'axios'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ChatSheet } from '@/modules/assistant/components/chat-sheet'
 import { ask } from '@/modules/assistant/services/assistant.service'
@@ -43,9 +43,7 @@ function sendTyped(text: string) {
 }
 
 function httpError(status: number) {
-  return new AxiosError('fail', String(status), undefined, undefined, {
-    status,
-  } as AxiosResponse)
+  return Object.assign(new AxiosError('fail'), { response: { status } })
 }
 
 describe('ChatSheet', () => {
