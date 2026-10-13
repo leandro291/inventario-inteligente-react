@@ -1,6 +1,6 @@
 # Pantallas del canvas — Chat IA
 
-Estado: aprobada
+Estado: implementada
 Fase: 05 de 5
 
 ## Objetivo
