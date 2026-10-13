@@ -61,8 +61,8 @@ beforeEach(() => {
 })
 
 describe('ProductsPage', () => {
-  it('CA1: / redirige a /products dentro del shell con Productos activo', async () => {
-    const router = setup('/')
+  it('CA1: /products se abre dentro del shell con Productos activo', async () => {
+    const router = setup('/products')
 
     expect(await screen.findByText('Agua mineral')).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/products')

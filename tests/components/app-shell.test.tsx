@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { AppShell } from '@/components/app-shell'
@@ -48,6 +48,35 @@ describe('AppShell', () => {
     )
   })
 
+  it('CA1: "Inicio" es el primer link y solo está activo en /', () => {
+    const router = createMemoryRouter(
+      [
+        {
+          element: <AppShell />,
+          children: [
+            { path: '/', element: <p>inicio</p> },
+            { path: '/products', element: <p>lista</p> },
+          ],
+        },
+      ],
+      { initialEntries: ['/'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    const nav = screen.getByRole('navigation', { name: 'Principal' })
+    const links = within(nav).getAllByRole('link')
+    expect(links[0]).toHaveAccessibleName('Inicio')
+    expect(links[0]).toHaveAttribute('aria-current', 'page')
+    expect(
+      links.slice(1).filter((l) => l.hasAttribute('aria-current')),
+    ).toEqual([])
+
+    fireEvent.click(screen.getByRole('link', { name: 'Productos' }))
+    expect(screen.getByRole('link', { name: 'Inicio' })).not.toHaveAttribute(
+      'aria-current',
+    )
+  })
+
   it('CA1: en /categories "Categorías" queda activo, entre Productos y Nuevo producto', () => {
     const router = createMemoryRouter(
       [
@@ -72,6 +101,6 @@ describe('AppShell', () => {
       within(nav)
         .getAllByRole('link')
         .map((link) => link.textContent),
-    ).toEqual(['Productos', 'Categorías', 'Nuevo producto'])
+    ).toEqual(['Inicio', 'Productos', 'Categorías', 'Nuevo producto'])
   })
 })
