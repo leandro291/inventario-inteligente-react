@@ -1,5 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { routes } from '@/router'
@@ -63,6 +69,18 @@ describe('ProductsPage', () => {
     expect(screen.getByRole('link', { name: 'Productos' })).toHaveAttribute(
       'aria-current',
       'page',
+    )
+  })
+
+  it('CA1: el botón "Nuevo producto" del header lleva a /products/new', async () => {
+    const router = setup()
+    await screen.findByText('Agua mineral')
+
+    const main = screen.getByRole('main')
+    fireEvent.click(within(main).getByRole('link', { name: 'Nuevo producto' }))
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe('/products/new'),
     )
   })
 
