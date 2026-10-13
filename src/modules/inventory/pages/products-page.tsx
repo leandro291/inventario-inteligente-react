@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { useSearchParams } from 'react-router'
+import { Link, useSearchParams } from 'react-router'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -115,11 +116,16 @@ export function ProductsPage() {
 
   return (
     <div className="flex flex-col gap-6 px-8 py-6">
-      <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
-        <p className="text-sm text-muted-foreground">
-          {products.isSuccess ? `${allProducts.length} productos` : '\u00A0'}
-        </p>
+      <header className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
+          <p className="text-sm text-muted-foreground">
+            {products.isSuccess ? `${allProducts.length} productos` : '\u00A0'}
+          </p>
+        </div>
+        <Button asChild variant="outline" className="h-11 px-4">
+          <Link to="/products/new">Nuevo producto</Link>
+        </Button>
       </header>
 
       <section className="rounded-xl bg-card ring-1 ring-border">

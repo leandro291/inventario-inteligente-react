@@ -1,11 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { api } from '@/lib/api'
 import {
+  createProduct,
   deleteProduct,
   getProducts,
 } from '@/modules/inventory/services/products.service'
 
-vi.mock('@/lib/api', () => ({ api: { get: vi.fn(), delete: vi.fn() } }))
+vi.mock('@/lib/api', () => ({
+  api: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
+}))
 
 const product = {
   id: 1,
@@ -38,5 +41,32 @@ describe('products.service', () => {
 
     await deleteProduct(7)
     expect(api.delete).toHaveBeenCalledWith('/products/7')
+  })
+
+  it('createProduct hace POST /products/ con nombre recortado y números, y devuelve el producto parseado', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: product })
+
+    await expect(
+      createProduct({
+        nombre: '  Mouse  ',
+        precio: 1234.5,
+        stock: 10,
+        category_id: 2,
+      }),
+    ).resolves.toEqual(product)
+    expect(api.post).toHaveBeenCalledWith('/products/', {
+      nombre: 'Mouse',
+      precio: 1234.5,
+      stock: 10,
+      category_id: 2,
+    })
+  })
+
+  it('createProduct rechaza si la respuesta no cumple productSchema', async () => {
+    vi.mocked(api.post).mockResolvedValue({ data: { ...product, id: 'x' } })
+
+    await expect(
+      createProduct({ nombre: 'Mouse', precio: 1, stock: 1, category_id: 2 }),
+    ).rejects.toThrow()
   })
 })

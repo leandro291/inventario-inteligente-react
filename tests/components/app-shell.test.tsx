@@ -24,4 +24,27 @@ describe('AppShell', () => {
     )
     expect(screen.getByRole('main')).toHaveTextContent('contenido')
   })
+
+  it('CA1: en /products/new solo "Nuevo producto" queda activo', () => {
+    const router = createMemoryRouter(
+      [
+        {
+          element: <AppShell />,
+          children: [
+            { path: '/products', element: <p>lista</p> },
+            { path: '/products/new', element: <p>alta</p> },
+          ],
+        },
+      ],
+      { initialEntries: ['/products/new'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    expect(
+      screen.getByRole('link', { name: 'Nuevo producto' }),
+    ).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: 'Productos' })).not.toHaveAttribute(
+      'aria-current',
+    )
+  })
 })

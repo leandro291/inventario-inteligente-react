@@ -1,8 +1,11 @@
-import { Boxes } from 'lucide-react'
+import { Boxes, Plus } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 import { cn } from '@/lib/utils'
 
-const NAV_ITEMS = [{ to: '/products', label: 'Productos', icon: Boxes }]
+const NAV_ITEMS = [
+  { to: '/products', label: 'Productos', icon: Boxes },
+  { to: '/products/new', label: 'Nuevo producto', icon: Plus },
+]
 
 export function AppShell() {
   return (
@@ -19,6 +22,7 @@ export function AppShell() {
           <NavLink
             key={to}
             to={to}
+            end
             className={({ isActive }) =>
               cn(
                 'flex h-11 items-center gap-2 rounded-md px-3 text-sm',
