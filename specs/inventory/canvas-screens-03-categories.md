@@ -1,6 +1,6 @@
 # Pantallas del canvas — Categorías
 
-Estado: aprobada
+Estado: implementada
 Fase: 03 de 5
 
 ## Objetivo
