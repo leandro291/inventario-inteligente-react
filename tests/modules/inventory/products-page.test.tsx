@@ -121,6 +121,19 @@ describe('ProductsPage', () => {
     ).toHaveTextContent('Snacks')
   })
 
+  it.each([
+    ['?category=abc', 'no numérico'],
+    ['?category=99', 'id inexistente'],
+  ])('CA3: %s (%s) se trata como "Todas"', async (search) => {
+    setup(`/products${search}`)
+
+    expect(await screen.findByText('Agua mineral')).toBeInTheDocument()
+    expect(screen.getByText('Papas fritas')).toBeInTheDocument()
+    expect(
+      screen.getByRole('combobox', { name: 'Categoría' }),
+    ).toHaveTextContent('Todas')
+  })
+
   it('CA4: badge de stock bajo en 10, no en 11', async () => {
     setup()
 
@@ -172,6 +185,7 @@ describe('ProductsPage', () => {
       expect(screen.getByRole('status')).toHaveTextContent(
         'Cargando productos…',
       )
+      expect(screen.queryByText(/\d+ productos/)).not.toBeInTheDocument()
     })
 
     it('error', async () => {
@@ -181,6 +195,7 @@ describe('ProductsPage', () => {
       expect(await screen.findByRole('alert')).toHaveTextContent(
         'No se pudieron cargar los productos.',
       )
+      expect(screen.queryByText(/\d+ productos/)).not.toBeInTheDocument()
     })
 
     it('sin productos', async () => {

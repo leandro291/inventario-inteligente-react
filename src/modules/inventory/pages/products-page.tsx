@@ -25,15 +25,24 @@ const stateClass = 'py-8 text-center text-sm text-muted-foreground'
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const q = searchParams.get('q') ?? ''
-  const category = searchParams.get('category') ?? ALL_CATEGORIES
 
   const products = useProducts()
   const categories = useCategories()
   const deleteProduct = useDeleteProduct()
+  // id y nombre se conservan al cerrar: el diálogo anima la salida con el nombre
   const [productToDelete, setProductToDelete] = useState<{
     id: number
     nombre: string
   } | null>(null)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+
+  // un ?category= que no es una categoría existente equivale a "Todas"
+  const categoryParam = searchParams.get('category')
+  const category = (categories.data ?? []).some(
+    (c) => String(c.id) === categoryParam,
+  )
+    ? (categoryParam ?? ALL_CATEGORIES)
+    : ALL_CATEGORIES
 
   function setParam(key: 'q' | 'category', value: string) {
     setSearchParams(
@@ -50,7 +59,7 @@ export function ProductsPage() {
   function handleConfirmDelete() {
     if (!productToDelete) return
     deleteProduct.mutate(productToDelete.id, {
-      onSettled: () => setProductToDelete(null),
+      onSettled: () => setIsDeleteOpen(false),
     })
   }
 
@@ -95,8 +104,10 @@ export function ProductsPage() {
       <ProductTable
         rows={rows}
         onDelete={(id) => {
-          const product = allProducts.find((p) => p.id === id)
-          if (product) setProductToDelete({ id, nombre: product.nombre })
+          const row = rows.find((r) => r.id === id)
+          if (!row) return
+          setProductToDelete({ id, nombre: row.nombre })
+          setIsDeleteOpen(true)
         }}
       />
     )
@@ -107,7 +118,7 @@ export function ProductsPage() {
       <header className="flex flex-col gap-1">
         <h1 className="text-2xl font-semibold tracking-tight">Productos</h1>
         <p className="text-sm text-muted-foreground">
-          {allProducts.length} productos
+          {products.isSuccess ? `${allProducts.length} productos` : '\u00A0'}
         </p>
       </header>
 
@@ -159,12 +170,12 @@ export function ProductsPage() {
       </section>
 
       <DeleteProductDialog
-        open={productToDelete !== null}
+        open={isDeleteOpen}
         productName={productToDelete?.nombre ?? ''}
         isPending={deleteProduct.isPending}
         onConfirm={handleConfirmDelete}
         onOpenChange={(open) => {
-          if (!open) setProductToDelete(null)
+          if (!open) setIsDeleteOpen(false)
         }}
       />
     </div>

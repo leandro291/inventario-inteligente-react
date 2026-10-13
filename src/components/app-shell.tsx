@@ -9,7 +9,7 @@ export function AppShell() {
     <div className="flex min-h-screen flex-wrap bg-background text-foreground">
       <nav
         aria-label="Principal"
-        className="flex w-full flex-col gap-1 bg-sidebar p-3 text-sidebar-foreground md:w-56"
+        className="flex flex-[1_1_224px] flex-col gap-1 bg-sidebar p-3 text-sidebar-foreground"
       >
         <div className="flex h-11 items-center gap-2 px-3 text-base font-semibold">
           <Boxes aria-hidden className="size-5" />
@@ -33,7 +33,7 @@ export function AppShell() {
           </NavLink>
         ))}
       </nav>
-      <main className="min-w-0 flex-1">
+      <main className="min-w-0 flex-[999_1_560px]">
         <Outlet />
       </main>
     </div>
