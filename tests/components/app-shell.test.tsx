@@ -74,4 +74,20 @@ describe('AppShell', () => {
         .map((link) => link.textContent),
     ).toEqual(['Productos', 'Categorías', 'Nuevo producto'])
   })
+
+  it('renderiza navFooter dentro de la nav', () => {
+    const router = createMemoryRouter(
+      [
+        {
+          element: <AppShell navFooter={<button>Pie</button>} />,
+          children: [{ path: '/products', element: <p>lista</p> }],
+        },
+      ],
+      { initialEntries: ['/products'] },
+    )
+    render(<RouterProvider router={router} />)
+
+    const nav = screen.getByRole('navigation', { name: 'Principal' })
+    expect(within(nav).getByRole('button', { name: 'Pie' })).toBeInTheDocument()
+  })
 })
