@@ -65,11 +65,15 @@ export function ProductForm({
     formState: { errors, isDirty },
   } = form
 
+  const categoryError = isCategoriesError
+    ? 'No se pudieron cargar las categorías.'
+    : errors.category_id?.message
+
   // aria-invalid + aria-describedby por campo con error
-  const a11y = (id: keyof ProductCreate) => ({
+  const a11y = (id: keyof ProductCreate, hasError = Boolean(errors[id])) => ({
     id,
-    'aria-invalid': errors[id] ? true : undefined,
-    'aria-describedby': errors[id] ? `${id}-error` : undefined,
+    'aria-invalid': hasError ? true : undefined,
+    'aria-describedby': hasError ? `${id}-error` : undefined,
   })
 
   return (
@@ -113,15 +117,7 @@ export function ProductForm({
           />
         </Field>
       </div>
-      <Field
-        id="category_id"
-        label="Categoría"
-        error={
-          isCategoriesError
-            ? 'No se pudieron cargar las categorías.'
-            : errors.category_id?.message
-        }
-      >
+      <Field id="category_id" label="Categoría" error={categoryError}>
         <Controller
           control={control}
           name="category_id"
@@ -132,7 +128,7 @@ export function ProductForm({
               onValueChange={(value) => field.onChange(Number(value))}
             >
               <SelectTrigger
-                {...a11y('category_id')}
+                {...a11y('category_id', Boolean(categoryError))}
                 className="w-full rounded-lg data-[size=default]:h-11"
               >
                 <SelectValue placeholder="Elegí una categoría" />

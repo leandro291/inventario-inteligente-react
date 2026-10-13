@@ -210,12 +210,18 @@ describe('NewProductPage', () => {
     expect(
       screen.getByRole('combobox', { name: 'Categoría' }),
     ).toHaveTextContent('Snacks')
+
+    // volver a editar oculta el aviso de error
+    type('Nombre', 'Otro')
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
   })
 
   it('CA6: la vista previa tiene placeholders y refleja lo escrito', async () => {
     setup()
-    const preview = screen.getByRole('heading', { name: 'Vista previa' })
-      .parentElement as HTMLElement
+    const preview = screen
+      .getByRole('heading', { name: 'Vista previa' })
+      .closest('[data-slot="card"]')
+    if (!preview) throw new Error('sin vista previa')
 
     expect(preview).toHaveTextContent('Nombre del producto')
     expect(preview).toHaveTextContent('Sin categoría')
@@ -245,6 +251,9 @@ describe('NewProductPage', () => {
     expect(
       await screen.findByText('No se pudieron cargar las categorías.'),
     ).toBeVisible()
+    const trigger = screen.getByRole('combobox', { name: 'Categoría' })
+    expect(trigger).toHaveAttribute('aria-invalid', 'true')
+    expect(trigger).toHaveAttribute('aria-describedby', 'category_id-error')
     expect(
       screen.getByRole('button', { name: 'Guardar producto' }),
     ).toBeDisabled()

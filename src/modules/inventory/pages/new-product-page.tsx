@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { Link } from 'react-router'
 import { ProductForm } from '@/modules/inventory/components/product-form'
@@ -23,6 +24,17 @@ export function NewProductPage() {
   })
   const categoryList = categories.data ?? []
 
+  // el aviso de error se oculta al volver a editar (igual que el de éxito)
+  const { isError, reset: resetCreate } = createProduct
+  useEffect(() => {
+    if (!isError) return undefined
+    const unsubscribe = form.subscribe({
+      formState: { values: true },
+      callback: () => resetCreate(),
+    })
+    return unsubscribe
+  }, [isError, resetCreate, form])
+
   function handleSubmit(values: ProductCreate) {
     createProduct.mutate(values, { onSuccess: () => form.reset() })
   }
@@ -30,7 +42,10 @@ export function NewProductPage() {
   return (
     <div className="flex flex-col gap-6 px-8 py-6">
       <header className="flex flex-col gap-1">
-        <Link to="/products" className="text-sm text-primary hover:underline">
+        <Link
+          to="/products"
+          className="inline-flex h-11 items-center self-start text-sm text-primary hover:underline"
+        >
           ← Productos
         </Link>
         <h1 className="text-2xl font-semibold tracking-tight">
