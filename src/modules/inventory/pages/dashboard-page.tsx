@@ -64,7 +64,7 @@ export function DashboardPage() {
           <p className={stateClass}>Todavía no hay productos.</p>
         ) : (
           <>
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-4">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(340px,100%),1fr))] gap-4">
               <CategoryStockChart items={data.porCategoria} />
               <CategoryValueChart items={data.porCategoria} />
             </div>
