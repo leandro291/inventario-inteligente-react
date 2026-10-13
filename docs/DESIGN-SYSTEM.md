@@ -47,7 +47,7 @@ Geist para texto, Geist Mono para números. Escala de Tailwind, sin tamaños arb
 - Base 4px. Página `px-8 py-6`; entre secciones `gap-6`; grids `gap-4`; card `[--card-spacing:--spacing(5)]` (el `Card` ya aplica el padding); form `p-6`.
 - Todo control interactivo mide al menos `h-11` (44px). Los defaults de shadcn son más chicos (`Button` `h-8`, `size="icon"` `size-8`), así que cada receta sobrescribe: botones de texto `h-11`, botones icono `size-11`.
 - Radios: `rounded-md` (links del nav, botones icono), `rounded-lg` (inputs, selects, botones), `rounded-xl` (cards).
-- Shell: `<nav>` lateral `w-56` + `<main className="min-w-0 flex-1">`. En pantallas angostas el nav se apila arriba (`flex flex-wrap`).
+- Shell: contenedor `flex min-h-screen flex-wrap content-start min-[784px]:content-stretch` (`content-start` evita que las líneas apiladas se estiren al alto de la ventana; desde 784px nav y main comparten línea y `content-stretch` hace que el sidebar ocupe todo el alto. Ojo: `flex-wrap` hace multilínea al contenedor aunque quede una sola línea, por eso `content-start` solo no sirve en desktop); `<nav className="flex-[1_1_224px]">` + `<main className="min-w-0 flex-[999_1_560px]">`. Debajo de ~784px el main (basis 560) no entra junto al nav y salta de línea: el nav queda arriba a ancho completo. En desktop el nav queda ~224px (el grow 999:1 le deja casi todo el sobrante al main). No usar `w-full md:w-56` + `flex-1` (basis 0: el main colapsa a 0 en la misma línea).
 - Grids responsivos: `grid-cols-[repeat(auto-fit,minmax(200px,1fr))]` para KPIs, `minmax(240px,1fr)` para cards de categoría, `minmax(340px,1fr)` para gráficos.
 - Tablas anchas dentro de `<div className="overflow-x-auto">`.
 
