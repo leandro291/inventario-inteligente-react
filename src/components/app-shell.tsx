@@ -6,7 +6,7 @@ const NAV_ITEMS = [{ to: '/products', label: 'Productos', icon: Boxes }]
 
 export function AppShell() {
   return (
-    <div className="flex min-h-screen flex-wrap bg-background text-foreground">
+    <div className="flex min-h-screen flex-wrap content-start min-[784px]:content-stretch bg-background text-foreground">
       <nav
         aria-label="Principal"
         className="flex flex-[1_1_224px] flex-col gap-1 bg-sidebar p-3 text-sidebar-foreground"
