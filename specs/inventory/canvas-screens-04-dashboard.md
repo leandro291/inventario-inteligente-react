@@ -1,6 +1,6 @@
 # Pantallas del canvas — Inicio
 
-Estado: aprobada
+Estado: implementada
 Fase: 04 de 5
 
 ## Objetivo
