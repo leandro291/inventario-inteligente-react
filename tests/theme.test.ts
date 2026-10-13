@@ -47,6 +47,11 @@ describe('tema', () => {
     expect(root).toContain('--primary: oklch(0.533 0.221 265.8);')
   })
 
+  test('usa Geist Mono para --font-mono', () => {
+    expect(css).toContain("@import '@fontsource-variable/geist-mono'")
+    expect(theme).toMatch(/--font-mono:[^;]*'Geist Mono Variable'/)
+  })
+
   test('no hay tema oscuro', () => {
     expect(css).not.toMatch(/\.dark\s*\{/)
   })
