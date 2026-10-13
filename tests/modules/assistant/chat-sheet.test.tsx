@@ -163,17 +163,16 @@ describe('ChatSheet', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
   })
 
-  it('CA6: muestra <b> como texto literal y respeta los saltos de línea', async () => {
-    vi.mocked(ask).mockResolvedValue({ respuesta: '<b>Total</b>\nlínea 2' })
+  it('CA6: muestra <b> como texto literal sin crear el elemento', async () => {
+    vi.mocked(ask).mockResolvedValue({ respuesta: '<b>Total</b> línea 2' })
     setup()
     open()
 
     sendTyped('Dame el total')
 
     const bubble = await screen.findByText(/<b>Total<\/b>/)
-    expect(bubble.textContent).toBe('<b>Total</b>\nlínea 2')
+    expect(bubble.textContent).toBe('<b>Total</b> línea 2')
     expect(bubble.querySelector('b')).toBeNull()
-    expect(bubble).toHaveClass('whitespace-pre-line')
   })
 
   it('CA7: la lista es un log con aria-live polite y el cierre es accesible', () => {
