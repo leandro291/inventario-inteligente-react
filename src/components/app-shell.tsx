@@ -1,8 +1,9 @@
-import { Boxes, Plus } from 'lucide-react'
+import { Boxes, House, Plus } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router'
 import { cn } from '@/lib/utils'
 
 const NAV_ITEMS = [
+  { to: '/', label: 'Inicio', icon: House },
   { to: '/products', label: 'Productos', icon: Boxes },
   { to: '/products/new', label: 'Nuevo producto', icon: Plus },
 ]
