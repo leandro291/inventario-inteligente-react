@@ -1,6 +1,6 @@
 # SETUP
 
-Reglas obligatorias del proyecto: estructura de carpetas, buenas prácticas y metodología de trabajo. Todo código nuevo (humano o agente) debe cumplirlas.
+Reglas obligatorias del proyecto: estructura de carpetas, buenas prácticas y convenciones de desarrollo. Todo código nuevo debe cumplirlas.
 
 ---
 
@@ -170,11 +170,11 @@ Se aplican siempre: al crear o envolver componentes shadcn, componentes propios,
 
 - No crear props, variantes, carpetas, abstracciones ni configuraciones "por si acaso".
 - No instalar dependencias para lo que se resuelve con pocas líneas o con lo ya instalado.
-- Lo que no pide la spec no se construye.
+- Solo se construye lo que el requisito pide.
 
 ---
 
-## 3. Metodología de trabajo
+## 3. Desarrollo
 
 ### 3.1 Reutilizar antes de crear
 
@@ -193,122 +193,7 @@ Antes de crear **cualquier** componente, hook, función o servicio, en este orde
 3. **¿Lo resuelve una librería ya instalada?** (TanStack Table/Query/Charts, react-hook-form, zod, radix-ui, lucide-react).
 4. **Solo entonces se crea**, pensado para ser reutilizable: props genéricas, sin datos del dominio hardcodeados si puede vivir en `src/components`.
 
-### 3.2 Modo de trabajo: SDD o BUILD
-
-El agente **Orquestador** clasifica cada pedido antes de empezar.
-
-**SDD** si se cumple al menos uno:
-
-- Feature, pantalla o módulo de dominio nuevo.
-- Contrato de datos nuevo o modificado (endpoint, schema zod, formulario).
-- Toca más de un módulo o más de ~5 archivos.
-- Crea un componente/hook compartido (`src/components`, `src/hooks`, `src/lib`).
-- Introduce estado global (store zustand) o decisiones de arquitectura.
-- Requisitos ambiguos que necesitan acordarse por escrito.
-
-**BUILD** si todo esto es cierto:
-
-- Cambio acotado: bug localizado, estilos, textos, renombre, config, agregar un componente shadcn, un test, refactor sin cambio de comportamiento.
-- ≤ 3 archivos, un solo módulo, sin contratos nuevos.
-
-Si hay duda, se le pregunta al usuario.
-
-### 3.3 SDD — Spec Driven Development
-
-Ningún feature SDD se implementa sin una spec **aprobada por el usuario**. Las specs viven en `specs/<domain>/<feature>.md`.
-
-**Aprobación humana (bloqueante):** solo una respuesta explícita del usuario aprueba una spec. El agente `spec` siempre la deja en `Estado: borrador`; el orquestador cambia a `aprobada` únicamente después de esa respuesta; el `developer` verifica `Estado: aprobada` antes de escribir cualquier archivo y, si no lo está, se detiene con `BLOQUEADO`. Cualquier cambio a la spec la devuelve a `borrador`.
-
-**Flujo:**
-
-```
-           ┌─ BUILD ─▶ Developer (DoD completa) ─▶ reporte
-Usuario ─▶ Orquestador
-           └─ SDD ──▶ Spec ─▶ aprobación ─▶ Developers por olas ─▶ Reviewer ─▶ reporte
-                                                   ▲                  │
-                                                   └── CAMBIOS (≤3) ──┘
-```
-
-**Planes alcanzables (tamaño de sesión):**
-
-- Una spec tiene ≤ 6 tareas, ≤ 3 olas y ≤ 5 archivos por tarea (sin contar tests).
-- Si el pedido es más grande se divide en fases (`<feature>-01-<fase>.md`, `-02-…`), cada una entregable por sí misma. Se implementa **una fase por sesión**.
-
-**Paralelismo sin conflictos:**
-
-- Cada archivo a crear/modificar pertenece a **una sola tarea** (propiedad exclusiva). Un developer nunca toca archivos fuera de su lista; si lo necesita, reporta `BLOQUEADO`.
-- Las tareas sin dependencias entre sí y con archivos disjuntos forman una **ola** y se lanzan en paralelo. Las olas se ejecutan en secuencia.
-- **Archivos compartidos** (`src/router.tsx`, `src/main.tsx`, `src/index.css`, `package.json`, `package-lock.json`, `components.json`, `src/components/ui/*`, `src/vite-env.d.ts`, `.env.example`) se tocan solo en tareas que van solas: `npm install` y `npx shadcn@latest add` en una tarea de preparación (ola 1); el registro de rutas en una tarea de integración (última ola).
-- Mientras hay developers en paralelo nadie corre `npm run build` (escribe `dist/` y `tsbuildinfo`). Usan checks acotados: `npx tsc -p tsconfig.app.json --noEmit`, `npx vitest run <tests>`, `npx oxlint <archivos>`, `npx prettier --write <archivos>`. La Definition of Done completa la corre el Reviewer al final.
-
-**Loop de revisión:** el Reviewer valida contra la spec. Si devuelve `CAMBIOS REQUERIDOS`, el Orquestador reparte los hallazgos entre developers (respetando la propiedad de archivos) y vuelve a revisar. Máximo **3 rondas**; después se escala al usuario.
-
-**Plantilla de spec:**
-
-```md
-# <Feature>
-
-Estado: borrador | aprobada | implementada
-Fase: 01 de N (omitir si no hay fases)
-
-## Objetivo
-
-Qué problema resuelve y para quién.
-
-## Alcance
-
-- Incluye: ...
-- No incluye: ...
-
-## Contratos de datos
-
-Schemas zod (campos y reglas) y endpoints (método, ruta, request, response).
-
-## UI
-
-Rutas/páginas y componentes.
-
-## Reutilización
-
-| Necesidad | Se reutiliza / se crea | Fuente (ruta, componente shadcn o librería) |
-| --------- | ---------------------- | ------------------------------------------- |
-
-## Plan de tareas
-
-| ID  | Ola | Tarea | Archivos (exclusivos) | Tests       | Depende de |
-| --- | --- | ----- | --------------------- | ----------- | ---------- |
-| T1  | 1   | ...   | `src/...`             | `tests/...` | —          |
-
-## Criterios de aceptación
-
-- [ ] CA1 criterio verificable (UI observable, test o código)
-- [ ] CA2 ...
-
-## Preguntas abiertas
-
-- Pregunta — suposición por defecto.
-
-## Fases siguientes
-
-- 02 — ...
-```
-
-### 3.4 Agentes
-
-Definidos en `.claude/agents/`. La sesión se inicia con el orquestador como agente principal:
-
-```bash
-claude --agent orchestrator
-```
-
-| Agente           | Responsabilidad                                                                                                         | Entrada                            | Salida                                   | No hace                                 |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ---------------------------------------- | --------------------------------------- |
-| **orchestrator** | Clasifica SDD/BUILD, pide aprobación de la spec, lanza developers por olas (en paralelo), mantiene el loop de revisión. | Pedido del usuario                 | Delegaciones, estado de la spec, resumen | No escribe specs ni código              |
-| **spec**         | Inventario de reutilización (3.1), redacta la spec con plan de tareas por olas y tamaño de sesión.                      | Pedido + código actual             | `specs/<domain>/<feature>.md`            | No escribe código                       |
-| **developer**    | Implementa una tarea (SDD) o un cambio acotado (BUILD) con sus tests, solo en sus archivos.                             | Spec + tarea + archivos permitidos | Código + tests + reporte                 | No cambia la spec, no amplía el alcance |
-| **reviewer**     | Valida criterios de aceptación, duplicados, reglas de este SETUP y la Definition of Done.                               | Spec + archivos cambiados          | `APROBADO` o `CAMBIOS REQUERIDOS`        | No edita código                         |
-
-### 3.5 Unit testing
+### 3.2 Unit testing
 
 Los tests viven en `tests/` replicando la ruta de `src/` (`tests/modules/products/...`).
 
@@ -328,13 +213,12 @@ Los tests viven en `tests/` replicando la ruta de `src/` (`tests/modules/product
 
 En tests de hooks y componentes se mockea la capa de servicio (`vi.mock`), nunca axios directo.
 
-### 3.6 Definition of Done
+### 3.3 Definition of Done
 
 Un feature está terminado cuando:
 
-- [ ] Cumple todos los criterios de aceptación de su spec.
+- [ ] Cumple los criterios de aceptación acordados.
 - [ ] `npm run build` pasa (incluye type-check).
 - [ ] `npm run lint` pasa.
 - [ ] `npx vitest run` pasa.
 - [ ] `npm run format:check` pasa.
-- [ ] El Reviewer lo aprobó.
